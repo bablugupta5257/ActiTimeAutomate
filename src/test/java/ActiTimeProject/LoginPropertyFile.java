@@ -9,7 +9,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 public class LoginPropertyFile {
 	
-	public String loginActiTime(String key) throws IOException {
+	public String loginActiTime(String key) throws IOException  {
 		FileInputStream f = new FileInputStream("./TestData/commonProperty.properties");
 		 Properties p = new Properties();
 		 p.load(f);

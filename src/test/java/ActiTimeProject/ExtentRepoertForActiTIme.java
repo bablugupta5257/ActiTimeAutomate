@@ -9,26 +9,53 @@ import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
 import com.google.common.io.Files;
 
-public class ListenersForSS extends BaseClass implements ITestListener{
+public class ExtentRepoertForActiTIme extends BaseClass implements ITestListener{
 
+	 public ExtentSparkReporter sparkreporter;
+	 public ExtentTest test;
+	 public ExtentReports reports;
+	
 	@Override
 	public void onTestStart(ITestResult result) {
-		// TODO Auto-generated method stub
+		sparkreporter = new ExtentSparkReporter(System.getProperty("user.dir")+"/reports/ActiTImeReport.html");
+		sparkreporter.config().setDocumentTitle("ActiTime Automation Report");
+		sparkreporter.config().setReportName("Functional Testing");
+		sparkreporter.config().setTheme(Theme.DARK);
+		
+		reports = new ExtentReports();
+		reports.attachReporter(sparkreporter);
+		
+		reports.setSystemInfo("Computer Name", "Hp Laptop 15");
+		reports.setSystemInfo("OS", "WIndows");
+		reports.setSystemInfo("Environment", "QA");
+		reports.setSystemInfo("Teste Name", "Babalu gupta");
+		
 		ITestListener.super.onTestStart(result);
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		// TODO Auto-generated method stub
+		
+		test = reports.createTest(result.getName());
+		test.log(Status.PASS, "The test case passed is: "+result.getName());
+		
 		ITestListener.super.onTestSuccess(result);
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result) {
-
 		String name = result.getName();
+		test = reports.createTest(name);
+		test.log(Status.FAIL, "The test case failes is: "+name);
+		test.log(Status.FAIL, "The test case fail is: "+result.getThrowable());
+
 		
 		TakesScreenshot t =(TakesScreenshot)driver;
 		 File src = t.getScreenshotAs(OutputType.FILE);  
@@ -39,22 +66,15 @@ public class ListenersForSS extends BaseClass implements ITestListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	/*	String ss = result.getName(); // used to take name of particular method who failed
-		TakesScreenshot t = (TakesScreenshot)driver;// driver is upcasted to access method of TakesScreenshot interface
-		File src = t.getScreenshotAs(OutputType.FILE); // output.file is used to covert ss to file
-		File dest = new File("./ScreenSHot/"+ss+".png");
-		try {
-			Files.copy(src, dest);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} */
 		ITestListener.super.onTestFailure(result);
 	}
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
-		// TODO Auto-generated method stub
+		String name = result.getName();
+		test = reports.createTest(name);
+		test.log(Status.SKIP, "The test case skipped is: "+name);
+		
 		ITestListener.super.onTestSkipped(result);
 	}
 
@@ -78,7 +98,7 @@ public class ListenersForSS extends BaseClass implements ITestListener{
 
 	@Override
 	public void onFinish(ITestContext context) {
-		// TODO Auto-generated method stub
+		reports.flush();
 		ITestListener.super.onFinish(context);
 	}
 
